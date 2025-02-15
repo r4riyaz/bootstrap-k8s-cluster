@@ -12,7 +12,8 @@
 
 ### Note:
 Don't use the above mentioned script if you want to learn cluster deployment using Kubeadm tool. These scripts will save your time if you need to deploy the cluster multiple times.
-For now refer the below [Instructions](https://github.com/r4riyaz/bootstrap-kubernetes-cluster/edit/main/README.md#master-node) for respective nodes.
+For now refer the below [Instructions](https://github.com/r4riyaz/bootstrap-kubernetes-cluster/edit/main/README.md#master-node) for respective nodes.\
+If you're executing the scripts then you have to run "kubeadm join ...." command manually. You can get get the full command from file "/root/kube_init_output" on Master Node.
 
 
 
