@@ -21,8 +21,10 @@ If you're executing the scripts then you have to run "kubeadm join ...." command
 ## Enable IPv4 packet forwarding:
 https://kubernetes.io/docs/setup/production-environment/container-runtimes/#prerequisite-ipv4-forwarding-optional \
 ```
+lsmod | grep -i br_netfilter
 modprobe br_netfilter
 echo "br_netfilter" > /etc/modules-load.d/k8s.conf
+lsmod | grep -i br_netfilter
 ```
 It's a single command starting from cat to the 3rd line EOF, make sure to copy and paste in one go.
 ```
