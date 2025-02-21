@@ -5,6 +5,7 @@
 ##It's a single command starting from cat to the 3rd line EOF, make sure copy and paste in one go.
 modprobe br_netfilter
 echo "br_netfilter" > /etc/modules-load.d/k8s.conf
+lsmod | grep -i br_netfilter
 
 cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
 net.ipv4.ip_forward = 1
