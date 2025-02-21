@@ -1,6 +1,6 @@
 #!/bin/bash
 
-##Enable IPv4 packet forwarding on both nodes
+echo "======= Enabling IPv4 packet forwarding ======="; sleep 2
 ##https://kubernetes.io/docs/setup/production-environment/container-runtimes/#prerequisite-ipv4-forwarding-optional
 ##It's a single command starting from cat to the 3rd line EOF, make sure copy and paste in one go.
 modprobe br_netfilter
@@ -17,11 +17,11 @@ sysctl net.ipv4.ip_forward
 sysctl net.bridge.bridge-nf-call-iptables
 
 
-##Install container runtime on all nodes
+echo "======= Installing container runtime ======="; sleep 2
 sudo apt-get update
 sudo apt-get install containerd -y
 
-##Install Kubeadm, Kubelet and Kubectl on all nodes
+echo "======= Installing Kubeadm, Kubelet and Kubectl ======="; sleep 2
 ##https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/
 
 sudo apt-get install -y apt-transport-https ca-certificates curl gpg
@@ -32,8 +32,11 @@ sudo apt-get update
 sudo apt-get install -y kubelet kubeadm kubectl
 sudo apt-mark hold kubelet kubeadm kubectl
 
-##Set the "systemd" cgroup driver for container runtime on all nodes
+echo "======= Setting up the systemd cgroup driver for container runtime ======="; sleep 2
 ##https://kubernetes.io/docs/setup/production-environment/container-runtimes/#containerd
 sudo mkdir -p /etc/containerd
 containerd config default | sed 's/SystemdCgroup = false/SystemdCgroup = true/g' | sudo tee /etc/containerd/config.toml
 sudo systemctl restart containerd
+
+echo "====== K8s slave server initialization completed ======="
+echo "Now, navigate to k8s-master server and get the command from file /root/kube_init_output to join the slave with master node.."
