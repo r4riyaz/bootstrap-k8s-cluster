@@ -88,13 +88,19 @@ If you already have the "Kubeadm join" command with token to join the master nod
 kubeadm token create --print-join-command
 ```
 
-## Installing Network Addon - Flannel:
+## Install Network Addon - Flannel:
 https://kubernetes.io/docs/concepts/cluster-administration/addons/#networking-and-network-policy
 https://github.com/flannel-io/flannel#deploying-flannel-manually
 ```
 sudo kubectl apply -f https://github.com/flannel-io/flannel/releases/latest/download/kube-flannel.yml
 ```
 
+## Configure shell autocomplition:
+https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/#enable-kubectl-autocompletion
+```
+echo 'source <(kubectl completion bash)' >> /root/.bashrc
+source /root/.bashrc
+```
 
 # Worker Node:
 ## Enable IPv4 packet forwarding:
@@ -145,4 +151,11 @@ If you miss the token output from "kubeadm init" command on Master. just copy th
 Demo Command (Don't copy paste it):
 ```
 kubeadm join 172.31.4.28:6443 --token b0ygt8.9h3ik9osty4r50zu --discovery-token-ca-cert-hash sha256:eec7dd42c34a6f8d6f40a35723c7f39d59eb5aa582b3f289687269da1d81bb3d
+```
+
+## Configure shell autocomplition:
+https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/#enable-kubectl-autocompletion
+```
+echo 'source <(kubectl completion bash)' >> /root/.bashrc
+source /root/.bashrc
 ```
