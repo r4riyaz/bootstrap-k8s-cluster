@@ -3,18 +3,21 @@
 echo "======= Enabling IPv4 packet forwarding ======="; sleep 2
 ##https://kubernetes.io/docs/setup/production-environment/container-runtimes/#prerequisite-ipv4-forwarding-optional
 ##It's a single command starting from cat to the 3rd line EOF, make sure copy and paste in one go.
-modprobe br_netfilter
-echo "br_netfilter" > /etc/modules-load.d/k8s.conf
-lsmod | grep -i br_netfilter
+cat <<EOF | sudo tee /etc/modules-load.d/k8s.conf
+overlay
+br_netfilter
+EOF
+
+sudo modprobe overlay
+sudo modprobe br_netfilter
 
 cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
-net.ipv4.ip_forward = 1
-net.bridge.bridge-nf-call-iptables = 1
+net.bridge.bridge-nf-call-iptables  = 1
+net.bridge.bridge-nf-call-ip6tables = 1
+net.ipv4.ip_forward                 = 1
 EOF
 
 sudo sysctl --system
-sysctl net.ipv4.ip_forward
-sysctl net.bridge.bridge-nf-call-iptables
 
 
 echo "======= Installing container runtime ======="; sleep 2
@@ -37,6 +40,11 @@ echo "======= Setting up the systemd cgroup driver for container runtime =======
 sudo mkdir -p /etc/containerd
 containerd config default | sed 's/SystemdCgroup = false/SystemdCgroup = true/g' | sudo tee /etc/containerd/config.toml
 sudo systemctl restart containerd
+
+echo "======= Configuring shell autocomplition ======";sleep 2
+#https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/#enable-kubectl-autocompletion
+echo 'source <(kubectl completion bash)' >> /root/.bashrc
+source /root/.bashrc
 
 echo "====== K8s slave server initialization completed ======="
 echo "Now, navigate to k8s-master server and get the command from file /root/kube_init_output to join the slave with master node.."
