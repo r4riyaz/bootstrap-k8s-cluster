@@ -3,18 +3,21 @@
 echo "======= Enabling IPv4 packet forwarding ======="; sleep 2
 ##https://kubernetes.io/docs/setup/production-environment/container-runtimes/#prerequisite-ipv4-forwarding-optional
 ##It's a single command starting from cat to the 3rd line EOF, make sure copy and paste in one go.
-modprobe br_netfilter
-echo "br_netfilter" > /etc/modules-load.d/k8s.conf
-lsmod | grep -i br_netfilter
+cat <<EOF | sudo tee /etc/modules-load.d/k8s.conf
+overlay
+br_netfilter
+EOF
+
+sudo modprobe overlay
+sudo modprobe br_netfilter
 
 cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
-net.ipv4.ip_forward = 1
-net.bridge.bridge-nf-call-iptables = 1
+net.bridge.bridge-nf-call-iptables  = 1
+net.bridge.bridge-nf-call-ip6tables = 1
+net.ipv4.ip_forward                 = 1
 EOF
 
 sudo sysctl --system
-sysctl net.ipv4.ip_forward
-sysctl net.bridge.bridge-nf-call-iptables
 
 
 echo "======= Installing container runtime ======="; sleep 2
@@ -55,13 +58,16 @@ sudo mkdir -p /root/.kube
 sudo cp -i /etc/kubernetes/admin.conf /root/.kube/config
 sudo chown root:root /root/.kube/config && sleep 20
 
-##If we miss the token output from "kubeadmin init" command then we can run below command to get token command again. Then run it on Worker node.
-#kubeadm token create --print-join-command
 
 echo "======= Installing Network Addon ======="; sleep 2
 ##https://kubernetes.io/docs/concepts/cluster-administration/addons/#networking-and-network-policy
 ##https://github.com/flannel-io/flannel#deploying-flannel-manually
 
 sudo kubectl apply -f https://github.com/flannel-io/flannel/releases/latest/download/kube-flannel.yml
+
+echo "======= Configuring shell autocomplition ======";sleep 2
+#https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/#enable-kubectl-autocompletion
+echo 'source <(kubectl completion bash)' >> /root/.bashrc
+source /root/.bashrc
 
 echo "====== K8s Master server initialization completed ======="
