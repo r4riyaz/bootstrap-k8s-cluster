@@ -21,22 +21,21 @@ If you're executing the scripts then you have to run "kubeadm join ...." command
 ## Enable IPv4 packet forwarding:
 https://kubernetes.io/docs/setup/production-environment/container-runtimes/#prerequisite-ipv4-forwarding-optional \
 ```
-lsmod | grep -i br_netfilter
-modprobe br_netfilter
-echo "br_netfilter" > /etc/modules-load.d/k8s.conf
-lsmod | grep -i br_netfilter
-```
-It's a single command starting from cat to the 3rd line EOF, make sure to copy and paste in one go.
-```
-cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
-net.ipv4.ip_forward = 1
-net.bridge.bridge-nf-call-iptables = 1
+cat <<EOF | sudo tee /etc/modules-load.d/k8s.conf
+overlay
+br_netfilter
 EOF
-```
-```
+
+sudo modprobe overlay
+sudo modprobe br_netfilter
+
+cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
+net.bridge.bridge-nf-call-iptables  = 1
+net.bridge.bridge-nf-call-ip6tables = 1
+net.ipv4.ip_forward                 = 1
+EOF
+
 sudo sysctl --system
-sysctl net.ipv4.ip_forward
-sysctl net.bridge.bridge-nf-call-iptables
 ```
 
 ## Install container runtime (Containerd):
@@ -44,6 +43,14 @@ sysctl net.bridge.bridge-nf-call-iptables
 sudo apt-get update
 sudo apt-get install containerd -y
 ```
+## Set the "systemd" cgroup driver for container runtime:
+https://kubernetes.io/docs/setup/production-environment/container-runtimes/#containerd
+```
+sudo mkdir -p /etc/containerd
+containerd config default | sed 's/SystemdCgroup = false/SystemdCgroup = true/g' | sudo tee /etc/containerd/config.toml
+sudo systemctl restart containerd
+```
+
 ## Install Kubeadm, Kubelet and Kubectl:
 https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/
 ```
@@ -53,14 +60,6 @@ echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.
 sudo apt-get update
 sudo apt-get install -y kubelet kubeadm kubectl
 sudo apt-mark hold kubelet kubeadm kubectl
-```
-
-## Set the "systemd" cgroup driver for container runtime:
-https://kubernetes.io/docs/setup/production-environment/container-runtimes/#containerd
-```
-sudo mkdir -p /etc/containerd
-containerd config default | sed 's/SystemdCgroup = false/SystemdCgroup = true/g' | sudo tee /etc/containerd/config.toml
-sudo systemctl restart containerd
 ```
 
 ## Initialize control-plane node:
@@ -106,20 +105,21 @@ source /root/.bashrc
 ## Enable IPv4 packet forwarding:
 https://kubernetes.io/docs/setup/production-environment/container-runtimes/#prerequisite-ipv4-forwarding-optional \
 ```
-modprobe br_netfilter
-echo "br_netfilter" > /etc/modules-load.d/k8s.conf
-```
-It's a single command starting from cat to the 3rd line EOF, make sure copy and paste in one go.
-```
-cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
-net.ipv4.ip_forward = 1
-net.bridge.bridge-nf-call-iptables = 1
+cat <<EOF | sudo tee /etc/modules-load.d/k8s.conf
+overlay
+br_netfilter
 EOF
-```
-```
+
+sudo modprobe overlay
+sudo modprobe br_netfilter
+
+cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
+net.bridge.bridge-nf-call-iptables  = 1
+net.bridge.bridge-nf-call-ip6tables = 1
+net.ipv4.ip_forward                 = 1
+EOF
+
 sudo sysctl --system
-sysctl net.ipv4.ip_forward
-sysctl net.bridge.bridge-nf-call-iptables
 ```
 
 ## Install container runtime:
@@ -127,6 +127,15 @@ sysctl net.bridge.bridge-nf-call-iptables
 sudo apt-get update
 sudo apt-get install containerd -y
 ```
+
+## Set the "systemd" cgroup driver for container runtime:
+https://kubernetes.io/docs/setup/production-environment/container-runtimes/#containerd
+```
+sudo mkdir -p /etc/containerd
+containerd config default | sed 's/SystemdCgroup = false/SystemdCgroup = true/g' | sudo tee /etc/containerd/config.toml
+sudo systemctl restart containerd
+```
+
 ## Install Kubeadm, Kubelet and Kubectl:
 https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/
 ```
@@ -136,14 +145,6 @@ echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.
 sudo apt-get update
 sudo apt-get install -y kubelet kubeadm kubectl
 sudo apt-mark hold kubelet kubeadm kubectl
-```
-
-## Set the "systemd" cgroup driver for container runtime:
-https://kubernetes.io/docs/setup/production-environment/container-runtimes/#containerd
-```
-sudo mkdir -p /etc/containerd
-containerd config default | sed 's/SystemdCgroup = false/SystemdCgroup = true/g' | sudo tee /etc/containerd/config.toml
-sudo systemctl restart containerd
 ```
 
 ## Join the worker node with Master:
