@@ -1,5 +1,8 @@
 #!/bin/bash
 
+echo "======= Updating Hostname ======="; sleep 2
+# update the hostname from k8s-node01 to required one, if you have multiple nodes in cluster
+hostnamectl set-hostname k8s-node01
 echo "======= Enabling IPv4 packet forwarding ======="; sleep 2
 ##https://kubernetes.io/docs/setup/production-environment/container-runtimes/#prerequisite-ipv4-forwarding-optional
 ##It's a single command starting from cat to the 3rd line EOF, make sure copy and paste in one go.
