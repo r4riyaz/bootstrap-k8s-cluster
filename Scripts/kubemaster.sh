@@ -52,7 +52,7 @@ echo "======= Initializing control-plane node ======="; sleep 2
 ##https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/
 
 PRIMARY_IP=$(ip route get 1.1.1.1 | awk '/via/ {print $7}')
-kubeadm init --apiserver-advertise-address ${PRIMARY_IP} --pod-network-cidr '10.244.0.0/16' --upload-certs --ignore-preflight-errors='NumCPU,Mem' | sudo tee /root/kube_init_output
+kubeadm init --apiserver-advertise-address ${PRIMARY_IP} --pod-network-cidr '10.0.0.0/16' --upload-certs --ignore-preflight-errors='NumCPU,Mem' | sudo tee /root/kube_init_output
 
 
 ##To start using your cluster, you need to run the following as a regular user:
@@ -66,7 +66,7 @@ echo "======= Installing Network Addon ======="; sleep 2
 ##https://kubernetes.io/docs/concepts/cluster-administration/addons/#networking-and-network-policy
 ##https://github.com/flannel-io/flannel#deploying-flannel-manually
 
-sudo kubectl apply -f https://github.com/flannel-io/flannel/releases/latest/download/kube-flannel.yml
+sudo kubectl apply -f https://reweave.azurewebsites.net/k8s/v1.32/net.yaml
 
 echo "======= Configuring shell autocomplition ======";sleep 2
 #https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/#enable-kubectl-autocompletion
